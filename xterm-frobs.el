@@ -6,7 +6,7 @@
 ;; Maintainer: friedman@splode.com
 ;; Created: 1998-03-21
 
-;; $Id: xterm-frobs.el,v 1.7 2004/05/25 17:42:19 friedman Exp $
+;; $Id: xterm-frobs.el,v 1.8 2009/10/22 00:08:31 friedman Exp $
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -19,9 +19,7 @@
 ;; GNU General Public License for more details.
 ;;
 ;; You should have received a copy of the GNU General Public License
-;; along with this program; if not, you can either send email to this
-;; program's maintainer or write to: The Free Software Foundation,
-;; Inc.; 59 Temple Place, Suite 330; Boston, MA 02111-1307, USA.
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
@@ -470,10 +468,21 @@ reloaded later."
       (goto-char (point-max))
       (insert ")\n\n(clear-face-cache)\n\n;; eof\n")
       (emacs-lisp-mode)
-      (lisp-indent-region (point-min) (point-max)))
+      (xterm-lisp-indent-region (point-min) (point-max)))
     (when (interactive-p)
       (pop-to-buffer buf)
       (message "Save this buffer to a file, then load it"))))
+
+;; Emacs post 23.1 removes lisp-indent-region
+(defun xterm-lisp-indent-region (start end)
+  "Indent every line whose first char is between START and END inclusive."
+  (save-excursion
+    (let ((endmark (copy-marker end)))
+      (goto-char start)
+      (and (bolp) (not (eolp))
+           (lisp-indent-line))
+      (indent-sexp endmark)
+      (set-marker endmark nil))))
 
 (defun xterm-standard-256color-alist ()
   "Generate the default 256-color map used by xterm.
